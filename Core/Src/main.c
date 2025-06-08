@@ -23,7 +23,8 @@ void ButtonInit()
 	uint32_t* GPIOA_MODER = (uint32_t*)(GPIOA_BASE_ADDR + 0x00);
 	*GPIOA_MODER &= ~(0b11 << 0);
 }
-typedef enum {
+typedef enum
+{
 	LED_GREEN = 12,
 	LED_ORANGE,
 	LED_RED,
@@ -413,15 +414,14 @@ char Read_SPI (char reg_add_slave)
 	uint32_t* SPI_SR = (uint32_t*)(SPI_BASE_ADDR + 0x08);
 	while (((*SPI_SR>> 7) & 1) == 1);
 	// Wait until TXE
-	while (((*SPI_SR >> 1) & 1) == 0);
+	while (((*SPI_SR >> 1) & 1) == 0); //đợi rỗng để ghi dữ liệu vào
 	// Wait until RXNE
-	while (((*SPI_SR >> 0) & 1) == 0);
-	// Read DR -> Clear Garbage data
+	while (((*SPI_SR >> 0) & 1) == 1); // Đọc dữ liệu từ buffer
+	//Read DR -> Clear Garbage data
 	*SPI_DR = 0xFF;
-	//-	Set PE3 (CS) to HIGH -> inactive slave
+	//Set PE3 (CS) to HIGH -> inactive slave
 	*GPIOE_ODR |= (1 << 3);
 }
-
 
 int main()
 {
