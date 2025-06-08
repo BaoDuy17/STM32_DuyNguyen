@@ -410,13 +410,13 @@ void SPI_Init()
 char Read_SPI (char reg_add_slave)
 {
 	// Set PE3 (CS) to low -> active slave
-	uint32_t* GPIOE_ODR = (uint32_t*)(GPIOE_BASE_ADDR + 0x14);
+	uint32_t* GPIOE_ODR = (uint32_t*)(GPIOE_BASE_ADDR + 0x14); // ODR: output data register
 	*GPIOE_ODR &=~ (1 << 3);
 
 	//Send register address of slave (write register address to DR)
-	uint32_t* SPI_DR = (uint32_t*)(SPI_BASE_ADDR + 0x0C);
+	uint16_t* SPI_DR = (uint16_t*)(SPI_BASE_ADDR + 0x0C);
 	*SPI_DR |= reg_add_slave;
-	uint32_t* SPI_SR = (uint32_t*)(SPI_BASE_ADDR + 0x08);
+	uint16_t* SPI_SR = (uint16_t*)(SPI_BASE_ADDR + 0x08);
 	while (((*SPI_SR>> 7) & 1) == 1);
 	// Wait until TXE
 	while (((*SPI_SR >> 1) & 1) == 0); //đợi rỗng để ghi dữ liệu vào
