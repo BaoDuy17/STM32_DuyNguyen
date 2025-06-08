@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0000200c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00002820  00000000  00000000  0000203c  2**0
+ 12 .debug_info   0000283b  00000000  00000000  0000203c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000ad5  00000000  00000000  0000485c  2**0
+ 13 .debug_abbrev 00000ad6  00000000  00000000  00004877  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000398  00000000  00000000  00005338  2**3
+ 14 .debug_aranges 00000398  00000000  00000000  00005350  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 00000299  00000000  00000000  000056d0  2**0
+ 15 .debug_rnglists 00000299  00000000  00000000  000056e8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000148df  00000000  00000000  00005969  2**0
+ 16 .debug_macro  000148e0  00000000  00000000  00005981  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00003b74  00000000  00000000  0001a248  2**0
+ 17 .debug_line   00003b77  00000000  00000000  0001a261  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00082384  00000000  00000000  0001ddbc  2**0
+ 18 .debug_str    00082384  00000000  00000000  0001ddd8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000a0140  2**0
+ 19 .comment      00000043  00000000  00000000  000a015c  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00000d60  00000000  00000000  000a0184  2**2
+ 20 .debug_frame  00000d60  00000000  00000000  000a01a0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000047  00000000  00000000  000a0ee4  2**0
+ 21 .debug_line_str 00000047  00000000  00000000  000a0f00  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -820,9 +820,9 @@ void USART1_IRQHandler()
  800068c:	08000bf4 	.word	0x08000bf4
 
 08000690 <main>:
+	//Set PE3 (CS) to HIGH -> inactive slave
 	*GPIOE_ODR |= (1 << 3);
 }
-
 
 int main()
 {

@@ -356,20 +356,22 @@ void I2C_Read_Data(uint8_t slave_reg_addr)
 #define GPIOE_BASE_ADDR 0x40021000
 void SPI_Init()
 {
+	// map chân PA5 - SPI_SCK, PA6 - MOSI, PA7 - MISO
+	// PE3 set as GPIO_OUTPIT
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	uint32_t* GPIOA_MODER = (uint32_t*)(GPIOA_BASE_ADDR + 0x00);
-	*GPIOA_MODER &=~ (0b1111 << 10);
-	*GPIOA_MODER |= (0b10 << 10);
+	*GPIOA_MODER &=~ (0b11 << 10);
+	*GPIOA_MODER |= (0b10 << 10); //PA5
 
-	*GPIOA_MODER &=~ (0b1111 << 12);
-	*GPIOA_MODER |= (0b10 << 12);
+	*GPIOA_MODER &=~ (0b11 << 12);
+	*GPIOA_MODER |= (0b10 << 12); // PA6
 
-	*GPIOA_MODER &=~ (0b1111 << 14);
-	*GPIOA_MODER |= (0b10 << 14);
+	*GPIOA_MODER &=~ (0b11 << 14);
+	*GPIOA_MODER |= (0b10 << 14); // PA7
 
 // set alternate function
 	uint32_t* GPIOA_AFRL = (uint32_t*)(GPIOA_BASE_ADDR + 0x20);
-	*GPIOA_AFRL &=~ (0b11 << 20); //PA5 CLK
+	*GPIOA_AFRL &=~ (0b1111 << 20); //PA5 CLK
 	*GPIOA_AFRL |= (0b0101 << 20);
 
 	*GPIOA_AFRL &=~ (0b1111 << 24); //PA6 MISO
@@ -378,20 +380,23 @@ void SPI_Init()
 	*GPIOA_AFRL &=~ (0b1111 << 28); //PA7 MOSI
 	*GPIOA_AFRL |= (0b0101 << 28);
 
+	// PE3 set as GPIO_OUTPUT
+	__HAL_RCC_GPIOE_CLK_ENABLE();
 	uint32_t* GPIOE_MODER = (uint32_t*)(GPIOE_BASE_ADDR + 0x00);
 	*GPIOE_MODER &=~ (0b1111 << 6); // PE3 Output
 	*GPIOE_MODER |= (0b01 << 6);
 
-
+//SPI Configuration
 	__HAL_RCC_SPI1_CLK_ENABLE();
-	// Configuration STM32 Master
-	uint32_t* SPI_CR1 = (uint32_t*)(SPI_BASE_ADDR + 0x00);
+
+	// Configuration STM32 Master Mode
+	uint16_t* SPI_CR1 = (uint16_t*)(SPI_BASE_ADDR + 0x00);
 	*SPI_CR1 &=~ (01111 << 2);
 	*SPI_CR1 |= (1 << 2);
 
 	// Use software slave management
 	*SPI_CR1 &=~ (0b1111 << 9);
-	*SPI_CR1 |= (1 << 9);
+	*SPI_CR1 |= (1 << 9) | (1 << 9);
 
 	//Set Clock
 	*SPI_CR1 &=~ (0b1111 << 3);
