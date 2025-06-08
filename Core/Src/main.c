@@ -413,18 +413,60 @@ char Read_SPI (char reg_add_slave)
 	uint32_t* GPIOE_ODR = (uint32_t*)(GPIOE_BASE_ADDR + 0x14); // ODR: output data register
 	*GPIOE_ODR &=~ (1 << 3);
 
-	//Send register address of slave (write register address to DR)
 	uint16_t* SPI_DR = (uint16_t*)(SPI_BASE_ADDR + 0x0C);
-	*SPI_DR |= reg_add_slave;
 	uint16_t* SPI_SR = (uint16_t*)(SPI_BASE_ADDR + 0x08);
-	while (((*SPI_SR>> 7) & 1) == 1);
-	// Wait until TXE
-	while (((*SPI_SR >> 1) & 1) == 0); //đợi rỗng để ghi dữ liệu vào
-	// Wait until RXNE
-	while (((*SPI_SR >> 0) & 1) == 1); // Đọc dữ liệu từ buffer
-	//Read DR -> Clear Garbage data
+
+	//BSY: SPI is busy in communication or TX buffer is not empty
+	while (((*SPI_SR >> 7) & 1) == 1); //Bit BSY: 1
+	*SPI_DR |= reg_add_slave | (1 << 7);
+	while (((*SPI_SR >> 1) & 1) == 0);
+	while (((*SPI_SR >> 7) & 1) == 1);
+
+	//Read DR -> Clear Garbage data sử dụng RXNE
+	while (((*SPI_SR >> 0) & 1) == 0); // RXNE
+	char data = *SPI_DR;
+
+	while (((*SPI_SR >> 1) & 1) == 0);
 	*SPI_DR = 0xFF;
-	//Set PE3 (CS) to HIGH -> inactive slave
+	while (((*SPI_SR >> 1) & 1) == 0);
+	while (((*SPI_SR >> 7) & 1) == 1);
+
+	while (((*SPI_SR >> 0) & 1) == 0);
+	data = *SPI_DR;
+
+	//inactive Slave
+	*GPIOE_ODR |= (1 << 3);
+
+	return data;
+
+}
+
+void Write_SPI(char reg_add_slave, char reg_value)
+{
+	uint32_t* GPIOE_ODR = (uint32_t*)(GPIOE_BASE_ADDR + 0x14); // ODR: output data register
+	*GPIOE_ODR &=~ (1 << 3);
+
+	uint16_t* SPI_DR = (uint16_t*)(SPI_BASE_ADDR + 0x0C);
+	uint16_t* SPI_SR = (uint16_t*)(SPI_BASE_ADDR + 0x08);
+
+	while (((*SPI_SR >> 7) & 1) == 1); //Bit BSY: 1
+	*SPI_DR |= reg_add_slave | (1 << 7);
+	while (((*SPI_SR >> 1) & 1) == 0);
+	while (((*SPI_SR >> 7) & 1) == 1);
+
+		//Read DR -> Clear Garbage data sử dụng RXNE
+	while (((*SPI_SR >> 0) & 1) == 0); // RXNE
+	char data = *SPI_DR;
+
+	while (((*SPI_SR >> 7) & 1) == 0);
+	*SPI_DR = reg_value;
+	while (((*SPI_SR >> 1) & 1) == 0);
+	while (((*SPI_SR >> 7) & 1) == 1);
+
+	while (((*SPI_SR >> 0) & 1) == 0);
+	data = *SPI_DR;
+
+	//inactive Slave
 	*GPIOE_ODR |= (1 << 3);
 }
 
@@ -435,6 +477,9 @@ int main()
 	ButtonInit();
 	EXTI0Init();
 	UART_Init();
+	SPI_Init();
+	char id = Read_SPI(0x0f);
+	id = Read_SPI(0x20);
 	while(1)
 	{
 		LedCtrl(LED_BLUE, 1);
